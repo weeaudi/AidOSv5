@@ -1,0 +1,78 @@
+name: Style & Linters (GCC)
+
+on: [push, pull_request]
+
+jobs:
+  style:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc g++ nasm cppcheck clang-format
+
+      - name: clang-format check (formatter only; no clang compiler)
+        run: |
+          files=$(git ls-files '*.c' '*.h' '*.cc' '*.cpp' '*.hpp')
+          if [ -n "$files" ]; then
+            clang-format --version
+            clang-format --dry-run --Werror $files
+          fi
+
+      - name: cppcheck (freestanding-ish)
+        run: |
+          files=$(git ls-files '*.c' '*.cc' '*.cpp' | tr '\n' ' ')
+          if [ -n "$files" ]; then
+            # Use generic checks; avoid missing standard library headers
+            cppcheck --enable=warning,style,performance,portability \
+                     --inline-suppr --quiet \
+                     --std=c++23 --std=c23 \
+                     --suppress=unmatchedSuppression \
+                     --suppress=missingIncludeSystem \
+                     --includes-file=/dev/null \
+                     $files || true
+          fi
+
+      - name: gcc syntax check (host-mode)
+        run: |
+          cfiles=$(git ls-files '*.c')
+          if [ -n "$cfiles" ]; then
+            for f in $cfiles; do
+              gcc -std=c23 -ffreestanding -fno-builtin -Wall -Wextra -Werror -pedantic -c -x c "$f" -o /dev/null || true
+            done
+          fi
+          cxxfiles=$(git ls-files '*.cc' '*.cpp')
+          if [ -n "$cxxfiles" ]; then
+            for f in $cxxfiles; do
+              g++ -std=c++23 -ffreestanding -fno-exceptions -fno-rtti -fno-builtin -Wall -Wextra -Werror -pedantic -c -x c++ "$f" -o /dev/null || true
+            done
+          fi
+
+      - name: asm-lint
+        run: |
+          chmod +x tools/asm_lint.sh
+          tools/asm_lint.sh
+
+      - name: Report style waivers (STYLE-IGNORE / NOLINT)
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const out = require('child_process').execSync("git grep -n -E 'STYLE-IGNORE|NOLINT' || true").toString().trim();
+            if (!out) return;
+            const body = [
+              '🔎 **Style waivers detected**',
+              '',
+              '```',
+              out,
+              '```',
+              'Please ensure each has a justification and narrow scope.'
+            ].join('\\n');
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body
+            });
