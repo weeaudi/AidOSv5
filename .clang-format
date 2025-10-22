@@ -27,3 +27,7 @@ IncludeCategories:
     Priority: 2
   - Regex: '^".*"$'          # local
     Priority: 3
+<<<<<<< HEAD
+=======
+
+>>>>>>> 42112b0 (fix clang issue again)
