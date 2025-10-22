@@ -1,0 +1,29 @@
+BasedOnStyle: LLVM
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ColumnLimit: 100
+
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterFunction: true          # Allman for functions
+  AfterControlStatement: false # Attach for if/while/for
+  BeforeElse: false
+
+SpaceBeforeParens: Never       # if(1 + 2){}
+PointerAlignment: Right        # char *p
+ReferenceAlignment: Right      # T &ref
+
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: true
+
+IncludeBlocks: Regroup
+SortIncludes: true
+IncludeCategories:
+  - Regex: '^<.*>$'          # system/freestanding shims
+    Priority: 1
+  - Regex: '^"aidos/.*"$'    # project public
+    Priority: 2
+  - Regex: '^".*"$'          # local
+    Priority: 3
