@@ -16,7 +16,7 @@ ReferenceAlignment: Right      # T &ref
 
 AllowShortIfStatementsOnASingleLine: false
 AllowShortLoopsOnASingleLine: false
-AllowShortFunctionsOnASingleLine: Empty
+AllowShortFunctionsOnASingleLine: true
 
 IncludeBlocks: Regroup
 SortIncludes: true

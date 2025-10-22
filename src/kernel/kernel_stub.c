@@ -2,4 +2,4 @@
  * context: kernel-only
  * notes: placeholder
  */
-int aidos_kernel_main(void){ return 0; }
+int aidos_kernel_main(void) { return 0; }
