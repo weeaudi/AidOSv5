@@ -27,5 +27,3 @@ IncludeCategories:
     Priority: 2
   - Regex: '^".*"$'          # local
     Priority: 3
-
-TrailingCommaInWrappedLiterals: Always
