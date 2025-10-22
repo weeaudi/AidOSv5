@@ -40,7 +40,7 @@ jobs:
           cfiles=$(git ls-files '*.c')
           if [ -n "$cfiles" ]; then
             for f in $cfiles; do
-              gcc -std=c23 -ffreestanding -fno-builtin -Wall -Wextra -Werror -pedantic -c -x c "$f" -o /dev/null || true
+              gcc -std=c2x -ffreestanding -fno-builtin -Wall -Wextra -Werror -pedantic -c -x c "$f" -o /dev/null || true
             done
           fi
           cxxfiles=$(git ls-files '*.cc' '*.cpp')
