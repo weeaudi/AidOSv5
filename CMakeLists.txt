@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 4.2)
+cmake_minimum_required(VERSION 3.28)
 project(aidos LANGUAGES C CXX ASM_NASM)
 
 set(CMAKE_C_STANDARD 23)
