@@ -1,12 +1,21 @@
 /* linker.ld — 16-bit flat binary linker script for BIOS boot sector */
 
 OUTPUT_FORMAT("elf32-i386")
-ENTRY(aidos_stage2_main)
+ENTRY(_entry)
 
 SECTIONS
 {
-    /* BIOS loads stage1 at 0x7C00 */
-    . = 0x7C00;
+    . = 0x10000;
+
+
+    .stage2_header :
+    {
+        *(.stage2_header*)
+    }
+
+    . = 0x10200;
+
+    __load = .;
 
     .text :
     {
@@ -23,10 +32,16 @@ SECTIONS
         *(.data*)
     }
 
+    __end = .;
+
     .bss :
     {
         *(COMMON)
         *(.bss*)
         . = ALIGN(4);
     }
+
+    __size = __end - __load;
+    __sectors = (__size + 511) / 512;
+
 }

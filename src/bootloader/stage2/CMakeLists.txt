@@ -1,5 +1,7 @@
 add_library(aidos_boot_stage2 OBJECT
   stage2_stub.c
+  entry.asm
+  header.asm
 )
 
 set(STAGE2_PUB_INC "${CMAKE_CURRENT_SOURCE_DIR}/include")
