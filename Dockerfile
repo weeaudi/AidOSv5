@@ -52,7 +52,7 @@ RUN set -eux; \
 RUN set -eux; \
     if [ -d "/opt/src/nasm-${NASM_VERSION}" ]; then \
       cd /opt/build/nasm; \
-      "/opt/src/nasm-${NASM_VERSION}/configure" \
+      "/opt/src/nasm-${NASM_VERSION}/configure"; \
       make -j${JOBS}; \
       make install; \
     else \
@@ -96,3 +96,5 @@ RUN echo 'echo "Toolchain installed under: ${PREFIX}"; \
 ${TARGET}-ld --version 2>/dev/null | head -n1 || true; \
 ${TARGET}-gcc --version 2>/dev/null | head -n1 || true; \
 nasm -v 2>/dev/null || true' > /etc/profile.d/toolchain-info.sh
+
+RUN echo 'export PATH=${PREFIX}/bin:$PATH' > /etc/profile.d/cross-toolchain.sh

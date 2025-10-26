@@ -27,6 +27,13 @@ check_file () {
     # mnemonic case + 4-space indent for instructions
     stripped="${line#"${line%%[! ]*}"}" # leading spaces removed
     if [[ -n "$stripped" && "${stripped:0:1}" != ';' && "${stripped:0:1}" != '.' && ! "$line" =~ ^[a-z0-9_]+:\ *$ ]]; then
+
+      mnem="${stripped%%[[:space:]]*}"
+
+      if [[ "${stripped:0:1}" == '%' ]] || [[ "$mnem" =~ ^(BITS|USE(16|32|64)|EXTERN|GLOBAL|SECTION|SEGMENT|ORG|ALIGN|EQU|STRUC|ENDSTRUC|INCBIN|INCLUDE)$ ]]; then
+        continue
+      fi
+
       indent=$(( ${#line} - ${#stripped} ))
       if (( indent != 4 )) && ! [[ "$line" =~ \;\ *STYLE-IGNORE\ INDENT ]]; then
         echo "$f:$n: INDENT: instructions indented by 4 spaces"; status=1
@@ -46,6 +53,7 @@ check_file () {
 }
 
 mapfile -t files < <(git ls-files '*.asm' '*.s' '*.S')
+
 for f in "${files[@]}"; do
   [ -f "$f" ] && check_file "$f"
 done

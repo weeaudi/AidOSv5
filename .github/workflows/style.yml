@@ -28,7 +28,6 @@ jobs:
             # Use generic checks; avoid missing standard library headers
             cppcheck --enable=warning,style,performance,portability \
                      --inline-suppr --quiet \
-                     --std=c++23 --std=c23 \
                      --suppress=unmatchedSuppression \
                      --suppress=missingIncludeSystem \
                      --includes-file=/dev/null \
@@ -36,19 +35,42 @@ jobs:
           fi
 
       - name: gcc syntax check (host-mode)
+        shell: bash
         run: |
+          set -euo pipefail
+          shopt -s nullglob
+
+          mapfile -d '' INC_DIRS < <(
+            find . -type d \( -name include -o -name internal \) \
+              -not -path './.git/*' \
+              -not -path './.github/*' \
+              -not -path './build/*' \
+              -not -path './out/*' \
+              -print0
+          )
+
+          INC_FLAGS=()
+          for d in "${INC_DIRS[@]}"; do
+            INC_FLAGS+=("-I" "$d")
+          done
+
           cfiles=$(git ls-files '*.c')
-          if [ -n "$cfiles" ]; then
-            for f in $cfiles; do
-              gcc -std=c2x -ffreestanding -fno-builtin -Wall -Wextra -Werror -pedantic -c -x c "$f" -o /dev/null || true
+          if [ -n "${cfiles}" ]; then
+            for f in ${cfiles}; do
+              gcc -std=c2x -ffreestanding -fno-builtin -Wall -Wextra -Werror -pedantic \
+                  "${INC_FLAGS[@]}" -I. -c -x c "$f" -o /dev/null || true
             done
           fi
+
           cxxfiles=$(git ls-files '*.cc' '*.cpp')
-          if [ -n "$cxxfiles" ]; then
-            for f in $cxxfiles; do
-              g++ -std=c++23 -ffreestanding -fno-exceptions -fno-rtti -fno-builtin -Wall -Wextra -Werror -pedantic -c -x c++ "$f" -o /dev/null || true
+          if [ -n "${cxxfiles}" ]; then
+            for f in ${cxxfiles}; do
+              g++ -std=c++23 -ffreestanding -fno-exceptions -fno-rtti -fno-builtin \
+                  -Wall -Wextra -Werror -pedantic \
+                  "${INC_FLAGS[@]}" -I. -c -x c++ "$f" -o /dev/null || true
             done
           fi
+
 
       - name: asm-lint
         run: |
