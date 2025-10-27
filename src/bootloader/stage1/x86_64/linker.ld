@@ -1,6 +1,6 @@
 /* linker.ld — 16-bit flat binary linker script for BIOS boot sector */
 
-OUTPUT_FORMAT("elf32-i386")
+OUTPUT_FORMAT("elf64-x86-64")
 ENTRY(_start)
 
 SECTIONS

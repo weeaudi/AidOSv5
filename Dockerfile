@@ -24,6 +24,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     bison flex \
     gawk \
     cmake \
+    parted \
     libgmp-dev libmpfr-dev libmpc-dev libisl-dev \
     file \
     && rm -rf /var/lib/apt/lists/*

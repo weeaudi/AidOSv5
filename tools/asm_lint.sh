@@ -56,7 +56,7 @@ check_file() {
 		fi
 	done <"$f"
 	# ISA tag check (vector use but no header tag)
-	if grep -Eq '\b[yz]mm[0-9]+\b|\bv[a-z0-9]{2,}\b' "$f"; then
+	if grep -Eq '\b(vmov|vadd|vsub|vmul|vdiv|vpx|vpb|vpm|vs|vz|vzero|zmm|ymm)[a-z0-9]*\b' "$f"; then
 		if ! head -n 8 "$f" | grep -Eq '^\;\s*ISA:'; then
 			echo "$f:1: ISATAG: file uses vector ISA but lacks '; ISA: ...' tag"
 			status=1

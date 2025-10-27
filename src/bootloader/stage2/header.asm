@@ -11,3 +11,6 @@ header:
     dd __load
     dd _entry
     dd __sectors
+
+    db "AID3724" ; signature
+    db "AIDOS STAGE2 VERSION 0.5" ; version number

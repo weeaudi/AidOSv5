@@ -5,7 +5,7 @@ ENTRY(_entry)
 
 SECTIONS
 {
-    . = 0x10000;
+    . = 0xA000;
 
 
     .stage2_header :
