@@ -1,29 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-usage() {
-	cat <<'EOF'
-make_image.sh [--img PATH] [--size-mb N] [--boot-sz-mib N] [--stage1 PATH] [--stage2 PATH] [--fat-label LABEL]
-
-You can also set the same via environment variables:
-  IMG, SIZE_MB, BOOT_SZ_MIB, STAGE1, STAGE2, FAT_LABEL
-
-Examples:
-  IMG=out/image.img SIZE_MB=256 BOOT_SZ_MIB=4 \
-    STAGE1=build/stage1.bin STAGE2=build/stage2.bin \
-    ./make_image.sh
-
-  ./make_image.sh --img out/image.img --size-mb 256 --boot-sz-mib 4 \
-    --stage1 build/stage1.bin --stage2 build/stage2.bin --fat-label AIDOSDATA
-EOF
-}
-
 # ---- defaults (can be overridden by env or flags) ----
 IMG="${IMG:-out/image.img}"
 SIZE_MB="${SIZE_MB:-128}"                                  # total image size
 BOOT_SZ_MIB="${BOOT_SZ_MIB:-3}"                            # boot partition size
 STAGE1="${STAGE1:-build/src/bootloader/stage1/stage1.bin}" # 512-byte stage1 (ends with 0x55AA)
-STAGE2="${STAGE2:-}"                                       # stage2 payload (raw binary)
+STAGE2="${STAGE2:-build/src/bootloader/stage2/stage2.bin}" # stage2 payload (raw binary)
+MBR="${MBR:-build/src/mbr.bin}"                            # Custom MBR using LBA
 FAT_LABEL="${FAT_LABEL:-AIDOSDATA}"
 
 # ---- parse flags (override env/defaults) ----
@@ -59,7 +43,6 @@ while [[ $# -gt 0 ]]; do
 		;;
 	*)
 		echo "Unknown arg: $1"
-		usage
 		exit 2
 		;;
 	esac
@@ -91,6 +74,7 @@ echo "    SIZE_MB     = $SIZE_MB"
 echo "    BOOT_SZ_MIB = $BOOT_SZ_MIB"
 echo "    STAGE1      = $STAGE1"
 echo "    STAGE2      = ${STAGE2:-<none>}"
+echo "    MBR         = ${MBR:-<none>}"
 echo "    FAT_LABEL   = $FAT_LABEL"
 
 # ---- create empty image ----
@@ -155,6 +139,9 @@ if [ -n "$STAGE2" ]; then
 else
 	echo "Note: STAGE2 not provided; only stage1 written (header assumed pre-existing)."
 fi
+
+echo "Installing MBR"
+dd if="$MBR" of="$IMG" bs=440 count=1 conv=notrunc status=none
 
 sync
 echo "Done. Image: $IMG"

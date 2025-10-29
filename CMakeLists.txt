@@ -12,7 +12,6 @@ set(CMAKE_C_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-option(ENABLE_FUZZING "Build host fuzz targets" OFF)
 option(ENABLE_RTTI_SOME "Allow RTTI selectively" OFF)
 
 # Freestanding defaults (target code)
@@ -29,14 +28,13 @@ add_subdirectory(src)
 
 # ---- User-tweakable cache variables ----
 set(IMAGE_OUT "${CMAKE_SOURCE_DIR}/out/image.img" CACHE STRING "Disk image output path")
-set(IMAGE_SIZE_MB 128 CACHE STRING "Total image size in MiB")
+set(IMAGE_SIZE_MB 1024 CACHE STRING "Total image size in MiB")
 set(BOOT_SIZE_MIB 3 CACHE STRING "Boot partition size in MiB")
 set(STAGE1_BIN "${CMAKE_BINARY_DIR}/src/bootloader/stage1/stage1.bin" CACHE FILEPATH "Path to 512-byte stage1")
-set(STAGE2_BIN "${CMAKE_BINARY_DIR}/src/bootloader/stage2/stage2.bin" CACHE FILEPATH "Path stage2")
+set(STAGE2_BIN "${CMAKE_BINARY_DIR}/src/bootloader/stage2/stage2.bin" CACHE FILEPATH "Path to stage2")
+set(MBR_BIN "${CMAKE_BINARY_DIR}/src/mbr.bin" CACHE FILEPATH "Path to custom mbr")
 set(FAT32_LABEL "AIDOSDATA" CACHE STRING "FAT32 partition label")
 
-message(STATUS ${STAGE1_BIN})
-message(STATUS ${STAGE2_BIN})
 
 # ---- Script path (adjust if you place it elsewhere) ----
 set(MAKE_IMAGE_SCRIPT "${CMAKE_SOURCE_DIR}/tools/image_gen.sh")
@@ -54,6 +52,7 @@ add_custom_command(
   BOOT_SZ_MIB=${BOOT_SIZE_MIB}
   STAGE1=${STAGE1_BIN}
   STAGE2=${STAGE2_BIN}
+  MBR=${MBR_BIN}
   FAT_LABEL="${FAT32_LABEL}"
   bash "${MAKE_IMAGE_SCRIPT}"
   COMMENT "Building disk image: ${IMAGE_OUT}"
@@ -61,12 +60,8 @@ add_custom_command(
 )
 
 add_custom_target(disk_image ALL DEPENDS ${IMAGE_OUT})
-add_dependencies(disk_image stage1_bin stage2_bin)
+add_dependencies(disk_image stage1_bin stage2_bin mbr)
 
 if(HOST_MODE)
   add_subdirectory(tests)
-endif()
-
-if(ENABLE_FUZZING AND HOST_MODE)
-  add_subdirectory(fuzz)
 endif()

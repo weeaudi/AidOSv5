@@ -1,6 +1,7 @@
 set(ASM_SOURCES
-    entry.asm
-    header.asm
+    arch/${TARGET}/data_grab.asm
+    arch/${TARGET}/entry.asm
+    arch/${TARGET}/header.asm
 )
 
 set(C_SOURCES

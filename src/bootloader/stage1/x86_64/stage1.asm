@@ -7,11 +7,6 @@
 ;   08:  _entry        (u32 linear address)
 ;   0C:  __sectors     (u32 count)
 ;   10:  "AID3724"     (7)
-;
-; Assumptions:
-;   - Real mode, DL = BIOS boot drive.
-;   - __load and _entry < 1 MiB (addressable via ES:BX).
-;   - BIOS INT 13h Extensions available.
 ; ------------------------------------------------------------------
 
 BITS 16
@@ -144,6 +139,7 @@ load_loop:
 
 jump_entry:
     mov eax, [entry_linear]
+    mov dl, [boot_drive]
     jmp dword eax
 
 skip:
