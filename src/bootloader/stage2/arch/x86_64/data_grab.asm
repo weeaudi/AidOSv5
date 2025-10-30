@@ -4,14 +4,14 @@
 
 BITS 16
 
-MAX_ENTRIES equ 20
+%define MAX_ENTRIES 20
 
 GLOBAL grab_memory
 GLOBAL find_rsdp
 
 EXTERN memory_map
 
-SECTION .text16 progbits alloc exec nowrite
+SECTION .text
 
 grab_memory:
     xor bx, bx                  ; EBX=0 to start
@@ -142,4 +142,4 @@ find_rsdp:
 
 SECTION .data16
 
-rsdp_sig db 'RSD PTR '        ; 8 bytes with trailing space.
+rsdp_sig: db 'RSD PTR '        ; 8 bytes with trailing space.

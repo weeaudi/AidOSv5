@@ -10,7 +10,7 @@ start:
     mov ds,ax
     mov es,ax
     sti
-    mov [BootDL], dl
+    mov [boot_dl], dl
 
     ; relocate 512 bytes: 7C00 -> 0600 (forward, no overlap issue)
     cld
@@ -41,7 +41,7 @@ reloc:
 
 .got:
     ; optional reset
-    mov dl,[BootDL]
+    mov dl,[boot_dl]
     xor ah,ah
     int 0x13
 
@@ -59,18 +59,18 @@ reloc:
     xor ax, ax
 
     mov si,bx
-    mov dl,[BootDL]
+    mov dl,[boot_dl]
     mov ah,0x42                  ; INT 13h extensions
     int 0x13
     jc  .retry
     jmp 0:0x7C00
 
 .retry:
-    mov dl,[BootDL]
+    mov dl,[boot_dl]
     xor ah,ah
     int 0x13
     mov si,bx
-    mov dl,[BootDL]
+    mov dl,[boot_dl]
     mov ah,0x42
     int 0x13
     jc  .halt
@@ -79,4 +79,4 @@ reloc:
 .halt:
     jmp .halt
 
-BootDL db 0
+boot_dl: db 0

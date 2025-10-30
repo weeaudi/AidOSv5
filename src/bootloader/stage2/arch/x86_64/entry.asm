@@ -13,8 +13,12 @@ EXTERN __bss_size
 
 EXTERN grab_memory
 EXTERN find_rsdp
+EXTERN init_32
+EXTERN init_64
+EXTERN _init
+EXTERN aidos_stage2_main
 
-SECTION .text16 progbits alloc exec nowrite
+SECTION .text
 
 _entry:
     mov sp, __top
@@ -26,6 +30,13 @@ _entry:
     call grab_memory
 
     call find_rsdp
+
+    push es
+    push di
+    pop word [rsdp]
+
+    push start_32
+    jmp init_32
 
 .loop:
     jmp .loop
@@ -50,8 +61,30 @@ clear_bss:
     jmp .loop
     ret
 
-SECTION .data16 write
+BITS 32
+
+start_32:
+
+    push start_64
+    jmp init_64
+
+    cli
+    hlt
+    jmp start_32
+
+BITS 64
+
+start_64:
+
+    call _init
+    call aidos_stage2_main
+
+    cli
+    hlt
+
+SECTION .data16
 boot_drive: db 0
 ; we need this in the lower section of memory
 ; so we keep it in data16 rather than bss
 memory_map: times 400 db 0
+rsdp: dw 0

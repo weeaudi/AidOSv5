@@ -18,12 +18,6 @@ SECTIONS
 
     __load = .;
 
-    /* need 16bit code at top of the file */
-    .text16 :
-    {
-        *(.text16*)
-    }
-
     .data16 :
     {
         *(.data16*)
@@ -36,12 +30,28 @@ SECTIONS
 
     .rodata :
     {
-        *(.rodata*)
+        *(.rodata)
     }
 
     .data :
     {
-        *(.data*)
+        *(.data)
+    }
+
+    .init : { KEEP(*(.init)) }
+    .fini : { KEEP(*(.fini)) }
+
+    .init_array : ALIGN(8) {
+    __init_array_start = .;
+    KEEP(*(.init_array .init_array.*))
+    KEEP(*(.ctors .ctors.*))    /* legacy */
+    __init_array_end = .;
+    }
+    .fini_array : ALIGN(8) {
+    __fini_array_start = .;
+    KEEP(*(.fini_array .fini_array.*))
+    KEEP(*(.dtors .dtors.*))
+    __fini_array_end = .;
     }
 
     __end = .;

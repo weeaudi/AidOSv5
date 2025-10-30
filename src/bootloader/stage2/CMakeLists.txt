@@ -2,10 +2,12 @@ set(ASM_SOURCES
     arch/${TARGET}/data_grab.asm
     arch/${TARGET}/entry.asm
     arch/${TARGET}/header.asm
+    arch/${TARGET}/init32.asm
+    arch/${TARGET}/init64.asm
 )
 
 set(C_SOURCES
-    stage2_stub.c
+    stage2_init.cpp
 )
 
 
@@ -32,7 +34,40 @@ set(LDSCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/linker.ld")
 
 target_link_libraries(aidos_boot_stage2 PRIVATE aidos_shared)
 
-add_executable(stage2.elf $<TARGET_OBJECTS:aidos_boot_stage2>)
+# Helper to ask the active compiler where a file lives.
+function(compiler_file OUT NAME)
+    # Try C compiler, then C++ compiler.
+    execute_process(COMMAND ${CMAKE_C_COMPILER} -print-file-name=${NAME}
+        OUTPUT_VARIABLE _p1 OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if(NOT _p1 OR _p1 STREQUAL "${NAME}")
+        execute_process(COMMAND ${CMAKE_CXX_COMPILER} -print-file-name=${NAME}
+            OUTPUT_VARIABLE _p1 OUTPUT_STRIP_TRAILING_WHITESPACE)
+    endif()
+    # If the compiler echoes the name unchanged, treat as not found.
+    if(NOT _p1 OR _p1 STREQUAL "${NAME}")
+        set(_p1 "")
+    endif()
+    set(${OUT} "${_p1}" PARENT_SCOPE)
+endfunction()
+
+compiler_file(CRTBEGIN_PATH crtbegin.o)
+compiler_file(CRTEND_PATH crtend.o)
+
+add_library(crti_obj OBJECT arch/${TARGET}/crti.asm)
+add_library(crtn_obj OBJECT arch/${TARGET}/crtn.asm)
+set_source_files_properties(
+    arch/${TARGET}/crti.asm arch/${TARGET}/crtn.asm
+    PROPERTIES COMPILE_FLAGS "-g -F dwarf"
+)
+
+add_executable(stage2.elf)
+target_sources(stage2.elf PRIVATE
+    $<TARGET_OBJECTS:crti_obj>
+    ${CRTBEGIN_PATH}
+    $<TARGET_OBJECTS:aidos_boot_stage2>
+    ${CRTEND_PATH}
+    $<TARGET_OBJECTS:crtn_obj>
+)
 target_link_options(stage2.elf PRIVATE
     -nostdlib -static -n
     -T "${LDSCRIPT}"

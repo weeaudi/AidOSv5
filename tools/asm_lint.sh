@@ -49,8 +49,9 @@ check_file() {
 				status=1
 			fi
 			mnem="${stripped%%[[:space:]]*}"
-			if [[ "$mnem" != "${mnem,,}" ]] && ! [[ "$line" =~ \;\ *STYLE-IGNORE\ MNEMONICCASE ]]; then
-				echo "$f:$n: MNEMONICCASE: mnemonic must be lowercase"
+			if [[ "$mnem" != "${mnem,,}" && "$mnem" != "${mnem^^}" ]] &&
+				! [[ "$line" =~ \;\ *STYLE-IGNORE\ MNEMONICCASE ]]; then
+				echo "$f:$n: MNEMONICCASE: mnemonic must be all lower or all upper case"
 				status=1
 			fi
 		fi
