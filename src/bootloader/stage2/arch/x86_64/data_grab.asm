@@ -8,7 +8,7 @@ BITS 16
 
 GLOBAL grab_memory
 GLOBAL find_rsdp
-global pci_bios_install_check
+GLOBAL pci_bios_install_check
 
 GLOBAL pci_sig
 GLOBAL pci_pm_entry
