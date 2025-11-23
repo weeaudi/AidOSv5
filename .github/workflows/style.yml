@@ -4,22 +4,19 @@ on: [push, pull_request]
 
 jobs:
   style:
+    permissions:
+      contents: read
+      pull-requests: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
       - name: Install tools
-        permissions:
-          contents: read
-          pull-requests: read
         run: |
           sudo apt-get update
           sudo apt-get install -y gcc g++ nasm cppcheck clang-format
 
       - name: clang-format check (formatter only; no clang compiler)
-        permissions:
-          contents: read
-          pull-requests: read
         run: |
           files=$(git ls-files '*.c' '*.h' '*.cc' '*.cpp' '*.hpp')
           if [ -n "$files" ]; then
@@ -28,9 +25,6 @@ jobs:
           fi
 
       - name: cppcheck (freestanding-ish)
-        permissions:
-          contents: read
-          pull-requests: read
         run: |
           files=$(git ls-files '*.c' '*.cc' '*.cpp' | tr '\n' ' ')
           if [ -n "$files" ]; then
@@ -44,9 +38,6 @@ jobs:
           fi
 
       - name: gcc syntax check (host-mode)
-        permissions:
-          contents: read
-          pull-requests: read
         shell: bash
         run: |
           set -euo pipefail
@@ -85,17 +76,11 @@ jobs:
 
 
       - name: asm-lint
-        permissions:
-          contents: read
-          pull-requests: read
         run: |
           chmod +x tools/asm_lint.sh
           tools/asm_lint.sh
 
       - name: Report style waivers (STYLE-IGNORE / NOLINT)
-        permissions:
-          contents: read
-          pull-requests: write
         if: ${{ github.event_name == 'pull_request' }}
         uses: actions/github-script@v7
         with:
