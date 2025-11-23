@@ -3,6 +3,4 @@
  * notes: pure function used for unit test skeleton
  */
 
-#include "shared/shared.h"
-
 int aidos_add(int a, int b) { return a + b; }

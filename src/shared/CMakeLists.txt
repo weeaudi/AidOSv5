@@ -1,4 +1,4 @@
 add_library(aidos_shared STATIC
-  shared_example.c
+  pci.cpp
 )
-target_include_directories(aidos_shared PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(aidos_shared PUBLIC ${CMAKE_SOURCE_DIR}/include)

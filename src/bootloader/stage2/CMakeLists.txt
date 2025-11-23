@@ -32,7 +32,12 @@ target_include_directories(aidos_boot_stage2
 
 set(LDSCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/linker.ld")
 
-target_link_libraries(aidos_boot_stage2 PRIVATE aidos_shared)
+target_link_libraries(aidos_boot_stage2 PRIVATE aidos_shared hal)
+target_include_directories(aidos_boot_stage2 PRIVATE
+    ${CMAKE_SOURCE_DIR}/include/
+    ${CMAKE_CURRENT_LIST_LINE}/include
+    ${CMAKE_CURRENT_LIST_LINE}/internal
+)
 
 # Helper to ask the active compiler where a file lives.
 function(compiler_file OUT NAME)
@@ -73,7 +78,10 @@ target_link_options(stage2.elf PRIVATE
     -T "${LDSCRIPT}"
     -Wl,-Map,stage2.map
 )
-target_link_libraries(stage2.elf PRIVATE aidos_shared)
+target_link_libraries(stage2.elf PRIVATE aidos_shared hal)
+target_include_directories(stage2.elf PRIVATE
+    ${CMAKE_SOURCE_DIR}/include/
+)
 set_target_properties(stage2.elf PROPERTIES LINK_DEPENDS "${LDSCRIPT}")
 
 set(STAGE2_BIN "${CMAKE_CURRENT_BINARY_DIR}/stage2.bin")

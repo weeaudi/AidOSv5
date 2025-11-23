@@ -46,7 +46,7 @@ RUN set -eux; \
       cd /opt/build/nasm; \
       "/opt/src/nasm-${NASM_VERSION}/configure"; \
       make -j${JOBS}; \
-      make install; \
+      make install;
 
 RUN set -eux; \
     cd /opt/build/binutils; \
@@ -73,13 +73,17 @@ RUN set -eux; \
       --enable-languages=c,c++ \
       --without-headers; \
     make -j6 all-gcc; \
-    make -j6 all-target-libgcc || true; \
+    make -j6 all-target-libgcc; \
     make -j6 install-gcc; \
-    make -j6 install-target-libgcc || true
+    make -j6 install-target-libgcc
 
 RUN echo 'echo "Toolchain installed under: ${PREFIX}"; \
-${TARGET}-ld --version 2>/dev/null | head -n1 || true; \
-${TARGET}-gcc --version 2>/dev/null | head -n1 || true; \
-nasm -v 2>/dev/null || true' > /etc/profile.d/toolchain-info.sh
+${TARGET}-ld --version 2>/dev/null | head -n1; \
+${TARGET}-gcc --version 2>/dev/null | head -n1; \
+nasm -v 2>/dev/null' > /etc/profile.d/toolchain-info.sh
+
+run chmod +x /etc/profile.d/toolchain-info.sh
 
 RUN echo 'export PATH=${PREFIX}/bin:$PATH' > /etc/profile.d/cross-toolchain.sh
+
+run chmod +x /etc/profile.d/cross-toolchain.sh

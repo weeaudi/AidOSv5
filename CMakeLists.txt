@@ -15,7 +15,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 option(ENABLE_RTTI_SOME "Allow RTTI selectively" OFF)
 
 # Freestanding defaults (target code)
-add_compile_options($<$<OR:$<COMPILE_LANGUAGE:C>,$<COMPILE_LANGUAGE:CXX>>:-ffreestanding\;-fno-builtin\;-Wall\;-Wextra\;-Werror\;-Wpedantic>)
+add_compile_options($<$<OR:$<COMPILE_LANGUAGE:C>,$<COMPILE_LANGUAGE:CXX>>:-ffreestanding\;-fno-builtin\;-Wall\;-Wextra\;-Werror\;-Wpedantic\;-g\;-O0>)
 add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions>)
 if(NOT ENABLE_RTTI_SOME)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-fno-rtti>)

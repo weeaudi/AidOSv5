@@ -8,6 +8,13 @@ BITS 16
 
 GLOBAL grab_memory
 GLOBAL find_rsdp
+global pci_bios_install_check
+
+GLOBAL pci_sig
+GLOBAL pci_pm_entry
+GLOBAL pci_hwchr
+GLOBAL pci_lastbus
+GLOBAL pci_ver
 
 EXTERN memory_map
 
@@ -140,6 +147,36 @@ find_rsdp:
     stc
     ret
 
+pci_bios_install_check:
+    pusha
+    xor    edi, edi          ; EDI must be 0
+    mov    ax, 0xB101
+    int    0x1A
+    jc     .fail             ; CF set -> not present / error
+    cmp    ah, 0
+    jne    .fail
+
+    ; Save outputs
+    mov    [pci_sig],    edx ; 'PCI ' = 0x20494350
+    mov    [pci_hwchr],  al  ; hardware characteristics bitfield
+    mov    [pci_ver],    bx  ; BCD: BH=major, BL=minor
+    mov    [pci_lastbus],cl  ; last PCI bus number
+    mov    [pci_pm_entry],edi ; phys addr of PM entry
+
+    clc
+    jmp    .out
+.fail:
+    stc
+.out:
+    popa
+    ret
+
 SECTION .data16
+
+pci_sig:       dd 0          ; expected 0x20494350 ('PCI ')
+pci_pm_entry:  dd 0          ; protected-mode entry point (physical)
+pci_hwchr:     db 0          ; bit0=mech1, bit1=mech2, bit4/5=special cycle mechs
+pci_lastbus:   db 0
+pci_ver:       dw 0          ; BH:BL = BCD version (e.g., 0x0201 = 2.01)
 
 rsdp_sig: db 'RSD PTR '        ; 8 bytes with trailing space.

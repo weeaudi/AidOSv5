@@ -20,7 +20,7 @@ start:
     rep movsb
     jmp 0:reloc-(0x7C00-0x600)                  ; continue in relocated copy
 
-; ===== runs at 0000:0621 =====
+; ===== runs at 0000:06xx =====
 reloc:
     ; find active partition at 0x07BE
     mov si,0x07BE

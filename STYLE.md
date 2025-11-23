@@ -1,10 +1,11 @@
 # Aidos Style Guide (C23 / C++23 freestanding / x86-64 NASM)
 
 ## Namespaces (C++) and C linkage
-- C++: top-level `namespace aidos { }`, then per subproject:
-  - `aidos::bootloader::stage2`
-  - `aidos::kernel`
-  - `aidos::shared`
+- C++: top-level namespace per subproject:
+  - `stage2`
+  - `kernel`
+  - `shared`
+  - `hal`
 - No `using namespace` at namespace scope.
 
 ## File & Function Headers

@@ -6,6 +6,7 @@ BITS 16
 
 GLOBAL _entry
 GLOBAL memory_map
+GLOBAL rsdp
 
 EXTERN __top
 EXTERN __bss_start
@@ -13,6 +14,7 @@ EXTERN __bss_size
 
 EXTERN grab_memory
 EXTERN find_rsdp
+EXTERN pci_bios_install_check
 EXTERN init_32
 EXTERN init_64
 EXTERN _init
@@ -31,9 +33,11 @@ _entry:
 
     call find_rsdp
 
+    call pci_bios_install_check
+
     push es
     push di
-    pop word [rsdp]
+    pop dword [rsdp]
 
     push start_32
     jmp init_32
